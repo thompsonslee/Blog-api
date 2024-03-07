@@ -9,7 +9,7 @@ const passportConfig = async(passport) => {
     passport.use("login", new LocalStrategy(async function verify(username,password,cd){
         const user = await User.findOne({username: username}).exec()
         if(!user){
-            return cb(null, false, "username and password dont match")
+            return cd(null, false, "username and password dont match")
         }
 
         if(bcrypt.compare(password,user.password)){
@@ -26,10 +26,10 @@ const passportConfig = async(passport) => {
 
     passport.use("jwt", new JWTStrategy(
         {
-            secretOrKey: "test",
-            jwtFromRequest: ExtractJWT.fromUrlQueryParameter("secret_token")
-        }, async(token,done) =>{
-            try{
+            secretOrKey: process.env.JWT_SECRET,
+            jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken("Authorization")
+        }, async (token,done) => {
+            try {
                 return done(null,token.user);
             }
             catch(error){
